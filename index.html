@@ -11,7 +11,7 @@
   <style>
     :root {
       --color-sail-white: #efedec;
-      --color-wind-blue: #00527f;
+      --color-wind-blue: #00527f;<
       --color-deep-sea: #00435a;
       --color-gold: #ae874d;
       --color-text: #183244;
@@ -1206,6 +1206,7 @@
     <section id="hero" class="hero-section">
       <div class="hero-media">
         <video
+          id="heroVideo"
           class="hero-video"
           autoplay
           muted
@@ -1597,6 +1598,34 @@
     });
 
     revealEls.forEach(el => observer.observe(el));
+    
+    const heroVideo = document.getElementById("heroVideo");
+  
+    if (heroVideo) {
+      heroVideo.muted = true;
+      heroVideo.setAttribute("muted", "");
+      heroVideo.setAttribute("playsinline", "");
+  
+      const playPromise = heroVideo.play();
+  
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          console.log("Autoplay was blocked by the browser.");
+  
+          // 第一次互動後再嘗試播放
+          const resumePlayback = () => {
+            heroVideo.play().catch(() => {});
+            window.removeEventListener("click", resumePlayback);
+            window.removeEventListener("touchstart", resumePlayback);
+            window.removeEventListener("scroll", resumePlayback);
+          };
+  
+          window.addEventListener("click", resumePlayback, { once: true });
+          window.addEventListener("touchstart", resumePlayback, { once: true });
+          window.addEventListener("scroll", resumePlayback, { once: true });
+        });
+      }
+    }
 
     
   </script>
